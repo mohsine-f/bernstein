@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: traefik
+  namespace: kube-public
+  labels:
+    app: traefik
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: traefik
+  template:
+    metadata:
+      labels:
+        app: traefik
+    spec:
+      serviceAccountName: traefik-account
+      containers:
+        - name: traefik
+          image: traefik:v2.10
+          ports:
+            - name: web
+              containerPort: 80
+            - name: admin
+              containerPort: 8080
+          args:
+            - "--api.insecure=true"
+            - "--log.level=DEBUG"
+            - "--providers.kubernetesIngress"
+            - "--entrypoints.web.address=:80"
